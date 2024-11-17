@@ -1,3 +1,5 @@
+![CI/CD Status](https://github.com/sssssubin/front_3rd_chapter4-1/actions/workflows/deployment.yml/badge.svg)
+
 # Next.js 자동 배포 CI/CD 파이프라인 구축
 
 > Last Updated: 2024.03.18
