@@ -9,8 +9,8 @@
 1. [소개](#소개)
 2. [특징](#특징)
 3. [배포 아키텍처](#배포-아키텍처)
-4. [시작하기](#시작하기)
-5. [배포 설정](#배포-설정)
+4. [배포 설정](#배포-설정)
+5. [시작하기](#시작하기)
 6. [문서](#문서)
 
 ## 소개
@@ -52,6 +52,18 @@
   - 빌드 결과물 S3 버킷 업로드
   - CloudFront 캐시 무효화로 최신 버전 제공
 
+## 배포 설정
+
+### GitHub Secrets 설정
+
+워크플로우 실행을 위해 GitHub 저장소의 Settings > Secrets and variables > Actions 메뉴에서 다음 값들을 설정해야 합니다:
+
+- `AWS_ACCESS_KEY_ID`: AWS IAM 사용자의 액세스 키 ID
+- `AWS_SECRET_ACCESS_KEY`: AWS IAM 사용자의 시크릿 액세스 키
+- `AWS_REGION`: AWS 리전 (예: ap-northeast-2)
+- `S3_BUCKET_NAME`: 정적 웹사이트 호스팅용 S3 버킷 이름
+- `CLOUDFRONT_DISTRIBUTION_ID`: CloudFront 배포 ID
+
 ## 시작하기
 
 ### 요구사항
@@ -79,18 +91,6 @@ yarn dev
 # or
 pnpm dev
 ```
-
-## 배포 설정
-
-### GitHub Secrets 설정
-
-워크플로우 실행을 위해 GitHub 저장소의 Settings > Secrets and variables > Actions 메뉴에서 다음 값들을 설정해야 합니다:
-
-- `AWS_ACCESS_KEY_ID`: AWS IAM 사용자의 액세스 키 ID
-- `AWS_SECRET_ACCESS_KEY`: AWS IAM 사용자의 시크릿 액세스 키
-- `AWS_REGION`: AWS 리전 (예: ap-northeast-2)
-- `S3_BUCKET_NAME`: 정적 웹사이트 호스팅용 S3 버킷 이름
-- `CLOUDFRONT_DISTRIBUTION_ID`: CloudFront 배포 ID
 
 ## 문서
 
