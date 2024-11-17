@@ -1,10 +1,35 @@
-# 프론트엔드 배포 파이프라인 가이드
+# Next.js 자동 배포 CI/CD 파이프라인 구축
 
-## 개요
+## 소개
 
-![aws drawio](https://github.com/user-attachments/assets/9f10c44c-6538-484a-aed9-b6cc4e053ad9)
+이 프로젝트는 AWS S3와 CloudFront를 활용하여 Next.js 애플리케이션의 자동 배포를 위한 CI/CD 파이프라인 구축 방법을 다룹니다. 코드 변경 시 자동으로 빌드 및 배포가 이루어져 빠르고 안정적인 배포 환경을 제공합니다.
 
-GitHub Actions에 워크플로우를 작성해 다음과 같이 배포가 진행되도록 합니다:
+## 프론트엔드 배포 파이프라인 가이드
+
+이 프로젝트는 GitHub Actions를 사용해 AWS S3와 CloudFront를 기반으로 배포를 자동화(CI/CD)합니다. 아래는 배포 파이프라인에 대한 가이드입니다.
+
+![AWS 배포 구조](https://github.com/user-attachments/assets/9f10c44c-6538-484a-aed9-b6cc4e053ad9)
+
+## 배포 파이프라인의 주요 특징
+
+### CI/CD 구현
+
+- **Continuous Integration (CI)**:  
+  main 브랜치로 푸시되면 자동으로 빌드와 테스트가 실행됩니다.
+- **Continuous Deployment (CD)**:  
+  성공적으로 빌드된 결과물을 S3 버킷에 업로드하고 CloudFront 캐시를 무효화하여 최신 버전을 사용자에게 제공합니다.
+
+### AWS 활용
+
+- **Amazon S3**:  
+  정적 웹사이트 호스팅용으로 사용됩니다. 빌드된 애플리케이션 파일들을 저장하고, 사용자에게 웹사이트 콘텐츠를 제공합니다.
+- **Amazon CloudFront**:  
+  전 세계에 분산된 엣지 로케이션을 통해 빠르게 콘텐츠를 배포합니다.CloudFront는 S3와 연결되어 콘텐츠를 캐싱하고, 사용자에게 더 빠르게 제공됩니다.
+
+### GitHub Actions 활용
+
+- **.github/workflows/deploy.yml**: 자동화된 배포 프로세스를 정의하는 파일입니다.
+- **push 또는 workflow_dispatch**: GitHub Actions 워크플로우를 자동으로 실행하거나 수동으로 실행할 수 있습니다.
 
 ## GitHub Actions 워크플로우 작성 가이드
 
