@@ -1,4 +1,4 @@
-# Next.js 자동 배포 CI/CD 파이프라인 Wiki
+# Next.js CI/CD 파이프라인 Wiki
 
 ## 목차
 
