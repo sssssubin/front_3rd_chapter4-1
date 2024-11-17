@@ -1,4 +1,4 @@
-# Next.js CI/CD 파이프라인 구축
+# Next.js CI/CD 파이프라인 구축 🚩
 
 ![CI/CD Status](https://github.com/sssssubin/front_3rd_chapter4-1/actions/workflows/deployment.yml/badge.svg)
 
