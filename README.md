@@ -1,23 +1,23 @@
 # Next.js 자동 배포 CI/CD 파이프라인 구축
 
-> Last Updated: 2024.03.17
+> Last Updated: 2024.03.18
 
 ## 목차
 
-1. [소개](#소개)
-2. [주요 링크 및 개념](#주요-링크-및-개념)
-3. [배포 아키텍처](#배포-아키텍처)
-4. [배포 파이프라인 가이드](#배포-파이프라인-가이드)
-5. [GitHub Actions 워크플로우 작성 가이드](#github-actions-워크플로우-작성-가이드)
-6. [GitHub Secrets 설정](#github-secrets-설정)
-7. [CDN과 성능 최적화](#cdn과-성능-최적화)
-8. [개발 환경 설정](#개발-환경-설정)
+1. [소개](#1-소개)
+2. [주요 링크 및 개념](#2-주요-링크-및-개념)
+3. [배포 아키텍처](#3-배포-아키텍처)
+4. [배포 파이프라인 가이드](#4-배포-파이프라인-가이드)
+5. [GitHub Actions 워크플로우 작성 가이드](#5-github-actions-워크플로우-작성-가이드)
+6. [GitHub Secrets 설정](#6-github-secrets-설정)
+7. [CDN과 성능 최적화](#7-cdn과-성능-최적화)
+8. [개발 환경 설정](#8-개발-환경-설정)
 
-## 소개
+## 1. 소개
 
 이 프로젝트는 AWS S3와 CloudFront를 활용하여 Next.js 애플리케이션의 자동 배포를 위한 CI/CD 파이프라인 구축 방법을 다룹니다. 코드 변경 시 자동으로 빌드 및 배포가 이루어져 빠르고 안정적인 배포 환경을 제공합니다.
 
-## 주요 링크 및 개념
+## 2. 주요 링크 및 개념
 
 ### 주요 링크
 
@@ -26,38 +26,60 @@
 
 ### 주요 개념
 
-- **GitHub Actions**과 CI/CD 도구: GitHub에서 제공하는 자동화된 워크플로우 도구입니다. 코드 변경사항이 발생할 때마다 자동으로 빌드, 테스트, 배포 등의 작업을 수행하여 지속적 통합(CI)과 지속적 배포(CD)를 가능하게 합니다.
+**GitHub Actions과 CI/CD 도구**
 
-- **S3와 스토리지**: Amazon S3(Simple Storage Service)는 AWS에서 제공하는 클라우드 스토리지 서비스입니다. 정적 웹사이트 호스팅이 가능하며, 높은 내구성과 가용성을 제공합니다. 이 프로젝트에서는 빌드된 Next.js 애플리케이션의 정적 파일들을 저장하고 서비스하는 데 사용됩니다.
+- GitHub에서 제공하는 자동화된 워크플로우 도구
+- 코드 변경사항 발생 시 자동으로 빌드, 테스트, 배포 수행
+- 지속적 통합(CI)과 지속적 배포(CD) 가능
 
-- **CloudFront와 CDN**: Amazon CloudFront는 AWS의 콘텐츠 전송 네트워크(CDN) 서비스입니다. 전 세계에 분산된 엣지 로케이션을 통해 콘텐츠를 캐싱하고 더 빠른 속도로 사용자에게 전달합니다. S3에 저장된 정적 파일들을 전 세계 사용자들에게 빠르게 제공하는 역할을 합니다.
+**S3와 스토리지**
 
-- **캐시 무효화(Cache Invalidation)**: CloudFront가 엣지 로케이션에 캐싱한 콘텐츠를 강제로 새로고침하는 프로세스입니다. 새로운 버전의 웹사이트가 배포될 때 실행되어, 사용자들이 항상 최신 버전의 콘텐츠를 받아볼 수 있도록 보장합니다.
+- Amazon S3(Simple Storage Service)는 AWS의 클라우드 스토리지 서비스
+- 정적 웹사이트 호스팅 가능
+- 높은 내구성과 가용성 제공
+- 빌드된 Next.js 애플리케이션의 정적 파일 저장 및 서비스
 
-- **Repository secret과 환경변수**: GitHub 저장소에서 안전하게 보관하는 민감한 정보들입니다. AWS 인증 정보와 같은 중요한 값들을 코드에 직접 노출시키지 않고 안전하게 사용할 수 있게 해줍니다. 이 프로젝트에서는 AWS 접근 키, 시크릿 키, 리전 정보 등을 저장하는데 사용됩니다.
+**CloudFront와 CDN**
 
-## 배포 아키텍처
+- Amazon CloudFront는 AWS의 콘텐츠 전송 네트워크(CDN) 서비스
+- 전 세계 엣지 로케이션을 통한 콘텐츠 캐싱
+- S3 저장 파일의 전 세계 빠른 전송
 
-![Next js 배포 아키텍처 시퀀스 다이어그램](https://github.com/user-attachments/assets/2845201e-4b93-47b8-acc8-9d715fba04bf)
+**캐시 무효화(Cache Invalidation)**
 
+- CloudFront 엣지 로케이션의 캐시 강제 새로고침
+- 새 버전 배포 시 실행
+- 최신 버전 콘텐츠 제공 보장
+
+**Repository secret과 환경변수**
+
+- GitHub 저장소의 안전한 민감 정보 보관
+- AWS 인증 정보 등 중요 값 보호
+- AWS 접근 키, 시크릿 키, 리전 정보 등 저장
+
+## 3. 배포 아키텍처
+
+<img src="https://github.com/user-attachments/assets/e1352a66-d606-4df4-a688-5fb875ae7e1d" style="display: block; width: 100%; max-width: 500px; margin: 0 auto" alt="Next js 배포 아키텍처 시퀀스 다이어그램">
+<br>
 배포 아키텍처는 GitHub Actions를 통한 자동화된 빌드 및 배포 프로세스를 보여줍니다. 코드가 main 브랜치에 푸시되면 자동으로 빌드되어 S3에 업로드되고, CloudFront를 통해 전 세계 사용자에게 배포됩니다.
 
-## 배포 파이프라인 가이드
+## 4. 배포 파이프라인 가이드
 
-이 프로젝트는 GitHub Actions를 사용해 AWS S3와 CloudFront를 기반으로 배포를 자동화(CI/CD)합니다. 아래는 배포 파이프라인에 대한 가이드입니다.
+이 프로젝트는 GitHub Actions를 사용해 AWS S3와 CloudFront를 기반으로 배포를 자동화(CI/CD)합니다.
 
 ![AWS 배포 구조](https://github.com/user-attachments/assets/9f10c44c-6538-484a-aed9-b6cc4e053ad9)
 
 ### 배포 파이프라인의 주요 특징
 
-#### CI/CD 구현
+**CI/CD 구현**
 
-- **Continuous Integration (CI)**:  
-  main 브랜치로 푸시되면 자동으로 빌드와 테스트가 실행됩니다.
-- **Continuous Deployment (CD)**:  
-  성공적으로 빌드된 결과물을 S3 버킷에 업로드하고 CloudFront 캐시를 무효화하여 최신 버전을 사용자에게 제공합니다.
+- Continuous Integration (CI)
+  - main 브랜치 푸시 시 자동 빌드 및 테스트 실행
+- Continuous Deployment (CD)
+  - 빌드 결과물 S3 버킷 업로드
+  - CloudFront 캐시 무효화로 최신 버전 제공
 
-## GitHub Actions 워크플로우 작성 가이드
+## 5. GitHub Actions 워크플로우 작성 가이드
 
 프로젝트 루트의 `.github/workflows/deploy.yml` 파일에 다음 내용을 작성합니다:
 
@@ -208,17 +230,17 @@ jobs:
           aws cloudfront create-invalidation --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} --paths "/*"
 ```
 
-## GitHub Secrets 설정
+## 6. GitHub Secrets 설정
 
 워크플로우 실행을 위해 GitHub 저장소의 Settings > Secrets and variables > Actions 메뉴에서 다음 값들을 설정해야 합니다:
 
-1. `AWS_ACCESS_KEY_ID`: AWS IAM 사용자의 액세스 키 ID
-2. `AWS_SECRET_ACCESS_KEY`: AWS IAM 사용자의 시크릿 액세스 키
-3. `AWS_REGION`: AWS 리전 (예: ap-northeast-2)
-4. `S3_BUCKET_NAME`: 정적 웹사이트 호스팅용 S3 버킷 이름
-5. `CLOUDFRONT_DISTRIBUTION_ID`: CloudFront 배포 ID
+- `AWS_ACCESS_KEY_ID`: AWS IAM 사용자의 액세스 키 ID
+- `AWS_SECRET_ACCESS_KEY`: AWS IAM 사용자의 시크릿 액세스 키
+- `AWS_REGION`: AWS 리전 (예: ap-northeast-2)
+- `S3_BUCKET_NAME`: 정적 웹사이트 호스팅용 S3 버킷 이름
+- `CLOUDFRONT_DISTRIBUTION_ID`: CloudFront 배포 ID
 
-## CDN과 성능 최적화
+## 7. CDN과 성능 최적화
 
 ### CDN(Content Delivery Network) 개요
 
@@ -232,7 +254,7 @@ CDN은 전 세계에 분산된 서버 네트워크를 통해 웹 콘텐츠를 �
 
 AWS의 CDN 서비스인 CloudFront는 전 세계 엣지 로케이션을 통해 콘텐츠를 빠르게 전달합니다.
 
-#### 엣지 로케이션 동작 방식
+### 엣지 로케이션 동작 방식
 
 1. 사용자가 웹사이트 접속
 2. DNS가 가장 가까운 CloudFront 엣지 로케이션으로 라우팅
@@ -279,7 +301,7 @@ AWS의 CDN 서비스인 CloudFront는 전 세계 엣지 로케이션을 통해 �
 
 CloudFront 도입으로 파일 크기는 평균 71% 감소했으며, 로딩 시간은 평균 38% 단축되어 웹사이트의 성능이 크게 개선되었습니다.
 
-## 개발 환경 설정
+## 8. 개발 환경 설정
 
 ### 요구사항
 
