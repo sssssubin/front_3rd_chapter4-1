@@ -61,8 +61,8 @@
 
 ## 3. 배포 아키텍처
 
-<img src="https://github.com/user-attachments/assets/e1352a66-d606-4df4-a688-5fb875ae7e1d" style="display: block; width: 100%; max-width: 500px; margin: 0 auto" alt="Next js 배포 아키텍처 시퀀스 다이어그램">
-<br>
+![Next js 배포 아키텍처 시퀀스 다이어그램](https://github.com/user-attachments/assets/00586fb4-944b-42ec-be54-7bb7ee6779b9)
+
 배포 아키텍처는 GitHub Actions를 통한 자동화된 빌드 및 배포 프로세스를 보여줍니다. 코드가 main 브랜치에 푸시되면 자동으로 빌드되어 S3에 업로드되고, CloudFront를 통해 전 세계 사용자에게 배포됩니다.
 
 ## 4. 배포 파이프라인 가이드
@@ -83,7 +83,7 @@
 
 ## 5. GitHub Actions 워크플로우 작성 가이드
 
-프로젝트 루트의 `.github/workflows/deploy.yml` 파일에 다음 내용을 작성합니다:
+프로젝트 루트의 `.github/workflows/deployment.yml` 파일에 다음 내용을 작성합니다:
 
 ### 워크플로우 이름 설정
 
@@ -184,54 +184,6 @@ steps:
 - `/*`는 모든 경로의 캐시를 무효화한다는 의미입니다.
 - 사용자들이 항상 최신 버전의 웹사이트를 볼 수 있도록 합니다.
 
-### 전체 워크플로우 파일
-
-다음은 전체 `deployment.yml` 파일의 내용입니다:
-
-```yaml
-name: Deploy Next.js to S3 and invalidate CloudFront
-
-on:
-  push:
-    branches:
-      - main
-  workflow_dispatch:
-
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: "18.x"
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build
-        run: npm run build
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
-
-      - name: Deploy to S3
-        run: |
-          aws s3 sync out/ s3://${{ secrets.S3_BUCKET_NAME }} --delete
-
-      - name: Invalidate CloudFront cache
-        run: |
-          aws cloudfront create-invalidation --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} --paths "/*"
-```
-
 ## 6. GitHub Secrets 설정
 
 워크플로우 실행을 위해 GitHub 저장소의 Settings > Secrets and variables > Actions 메뉴에서 다음 값들을 설정해야 합니다:
@@ -244,7 +196,7 @@ jobs:
 
 ## 7. CDN과 성능 최적화
 
-### CDN(Content Delivery Network) 개요
+**CDN(Content Delivery Network) 개요**
 
 CDN은 전 세계에 분산된 서버 네트워크를 통해 웹 콘텐츠를 빠르고 안정적으로 제공하는 시스템입니다.
 
@@ -252,31 +204,31 @@ CDN은 전 세계에 분산된 서버 네트워크를 통해 웹 콘텐츠를 �
 - 서버 부하 감소
 - 전반적인 사용자 경험 개선
 
-### AWS CloudFront
+**AWS CloudFront**
 
-AWS의 CDN 서비스인 CloudFront는 전 세계 엣지 로케이션을 통해 콘텐츠를 빠르게 전달합니다.
+- AWS의 CDN 서비스인 CloudFront는 전 세계 엣지 로케이션을 통해 콘텐츠를 빠르게 전달합니다.
 
-### 엣지 로케이션 동작 방식
+**엣지 로케이션 동작 방식**
 
-1. 사용자가 웹사이트 접속
-2. DNS가 가장 가까운 CloudFront 엣지 로케이션으로 라우팅
-3. 엣지 로케이션에서 요청 콘텐츠 확인
-4. 캐시된 콘텐츠가 있으면 즉시 응답
+1.  사용자가 웹사이트 접속
+2.  DNS가 가장 가까운 CloudFront 엣지 로케이션으로 라우팅
+3.  엣지 로케이션에서 요청 콘텐츠 확인
+4.  캐시된 콘텐츠가 있으면 즉시 응답
 
 ### 성능 비교: CloudFront vs S3
 
-#### CloudFront를 통한 콘텐츠 전달
-
 ![CloudFront](https://github.com/user-attachments/assets/7597f03d-daff-4979-9b05-db39b64d3a44)
+
+#### CloudFront를 통한 콘텐츠 전달
 
 - 콘텐츠 압축 제공 (`Content-Encoding` 헤더 존재)
 - 캐시 적용 (`X-Cache: Hit from cloudfront` 헤더)
 - 빠른 응답 속도
 - 작은 파일 사이즈
 
-#### S3 직접 접근
-
 ![s3](https://github.com/user-attachments/assets/688e9019-f965-48c2-895f-aa0eca582294)
+
+#### S3 직접 접근
 
 - 콘텐츠 압축 없음 (`Content-Encoding` 헤더 없음)
 - 상대적으로 느린 응답 속도
@@ -294,7 +246,7 @@ AWS의 CDN 서비스인 CloudFront는 전 세계 엣지 로케이션을 통해 �
 | CSS        | 9.1 KB  | 2.9 KB          | 68%    | 948ms   | 629ms           | 34%    |
 | JavaScript | 166 KB  | 50.2 KB         | 70%    | 2.37s   | 1.12s           | 53%    |
 
-### 전체 성능 개선 요약
+#### 전체 성능 개선 요약
 
 - **평균 파일 크기 감소율**: 약 71%
 - **평균 로딩 시간 개선율**: 약 38%
