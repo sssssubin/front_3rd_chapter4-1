@@ -2,7 +2,7 @@
 
 ![CI/CD Status](https://github.com/sssssubin/front_3rd_chapter4-1/actions/workflows/deployment.yml/badge.svg)
 
-> Last Updated: 2024.03.18
+> Last Updated: 2024.11.21
 
 ## 목차
 
